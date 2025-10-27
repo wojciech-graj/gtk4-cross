@@ -3,7 +3,7 @@ set -euo pipefail
 
 GTK=${GTK:-"main"}
 ADW=${ADW:-"main"}
-BASE=${BASE:-"gtk4-cross-base-$GTK-$ADW"}
+BASE=${BASE:-"gtk4-cross-base-hub-$GTK-$ADW"}
 
 if [[ $1 == "base" ]]; then
     echo "Building base image"

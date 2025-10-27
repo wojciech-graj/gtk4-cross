@@ -20,7 +20,8 @@ RUN . ~/.cargo/env && cargo install --git https://github.com/MGlolenstine/peldd_
 FROM fedora:42
 COPY --from=0 /root/pe-util/build/peldd /usr/bin/peldd
 COPY --from=1 /root/.cargo/bin/peldd_dependency_scanner /usr/bin/pds
-RUN dnf install git mingw64-binutils mingw64-gcc meson mingw64-pango mingw64-gdk-pixbuf mingw64-libepoxy mingw64-winpthreads-static glib2-devel gobject-introspection-devel mingw64-gstreamer1-plugins-bad-free vala wine cmake gcc zip boost boost-system dos2unix sassc mingw64-librsvg2 intltool itstool gtk-update-icon-cache adwaita-icon-theme mingw64-adwaita-icon-theme mingw64-gettext mingw64-libyaml mingw64-xz mingw64-xz-libs mingw64-zstd gperf -y && dnf clean all -y
+# Some of these dependencies are likely not needed anymore
+RUN dnf install git mingw64-binutils mingw64-gcc meson mingw64-pango mingw64-gdk-pixbuf mingw64-libepoxy mingw64-winpthreads-static glib2-devel gobject-introspection-devel mingw64-gstreamer1-plugins-bad-free vala wine cmake gcc zip boost boost-system dos2unix sassc mingw64-librsvg2 intltool itstool gtk-update-icon-cache adwaita-icon-theme mingw64-adwaita-icon-theme mingw64-gettext mingw64-libyaml mingw64-xz mingw64-xz-libs mingw64-zstd gperf fedora-repos-rawhide mingw64-vulkan-loader mingw64-vulkan-headers glslc mingw64-gcc-c++ -y && dnf install --disablerepo="*" --enablerepo=rawhide mingw64-appstream -y && dnf clean all -y
 
 # Clone the gtk4 repository (Move after the mingw setup for efficiency later)
 WORKDIR /tmp
@@ -72,7 +73,7 @@ RUN wine $MINGW_PREFIX/bin/gdk-pixbuf-query-loaders.exe --update-cache
 
 # Build and install GTK4
 WORKDIR /tmp/gtk
-RUN x86_64-meson build -Dintrospection=disabled --wrap-mode=default
+RUN x86_64-meson build -Dintrospection=disabled -Dmedia-gstreamer=disabled --wrap-mode=default
 WORKDIR /tmp/gtk/build
 RUN meson configure -Db_lto=false -Dc_link_args="['-lssp']" -Dc_args=-DG_ENABLE_DEBUG -Dtracker=disabled
 RUN ninja all && ninja install
